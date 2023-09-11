@@ -1,0 +1,35 @@
+version: '2.1'
+services:
+  pg-0:
+    build: ./postgres
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_PASSWORD=abcABC123
+      - HEALTHCHECK_USER=healthcheck
+      - HEALTHCHECK_PASS=healthcheck
+      - DB_REP_USER=repuser
+      - DB_REP_PASS=reppassword
+    ports:
+      - 5433:5432
+  pgpool:
+    image: docker.io/bitnami/pgpool:4
+    ports:
+      - 5432:5432
+    environment:
+      - PGPOOL_BACKEND_NODES=0:pg-0:5432
+      - PGPOOL_SR_CHECK_USER=healthcheck
+      - PGPOOL_SR_CHECK_PASSWORD=healthcheck
+      - PGPOOL_ENABLE_LDAP=no
+      - PGPOOL_POSTGRES_USERNAME=postgres
+      - PGPOOL_POSTGRES_PASSWORD=abcABC123
+      - PGPOOL_ADMIN_USERNAME=postgres
+      - PGPOOL_ADMIN_PASSWORD=abcABC123
+      - PGPOOL_ENABLE_LOAD_BALANCING=yes
+      # - PGPOOL_POSTGRES_CUSTOM_USERS=postgres
+      # - PGPOOL_POSTGRES_CUSTOM_PASSWORDS=abcABC123
+    healthcheck:
+      test: [ "CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
