@@ -6,12 +6,13 @@ services:
   pg-0:
     image: docker.io/bitnami/postgresql-repmgr:14
     ports:
-      - 5432
+      - 5433:5432
     volumes:
       - ./pg-0:/bitnami/postgresql
     environment:
       - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
-      - POSTGRESQL_PASSWORD=abcABC123
+      - POSTGRESQL_USERNAME=customuser
+      - POSTGRESQL_PASSWORD=custompassword
       - POSTGRESQL_DATABASE=customdatabase
       - POSTGRESQL_NUM_SYNCHRONOUS_REPLICAS=1
       - REPMGR_PRIMARY_HOST=pg-0
@@ -23,12 +24,15 @@ services:
   pg-1:
     image: docker.io/bitnami/postgresql-repmgr:14
     ports:
-      - 5432
+      - 5434:5432
+    links:
+      - pg-0
     volumes:
       - ./pg-1:/bitnami/postgresql
     environment:
       - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
-      - POSTGRESQL_PASSWORD=abcABC123
+      - POSTGRESQL_USERNAME=customuser
+      - POSTGRESQL_PASSWORD=custompassword
       - POSTGRESQL_DATABASE=customdatabase
       - POSTGRESQL_NUM_SYNCHRONOUS_REPLICAS=1
       - REPMGR_PRIMARY_HOST=pg-0
@@ -51,8 +55,8 @@ services:
       - PGPOOL_ADMIN_USERNAME=admin
       - PGPOOL_ADMIN_PASSWORD=adminpassword
       - PGPOOL_ENABLE_LOAD_BALANCING=yes
-      - PGPOOL_POSTGRES_CUSTOM_USERS=postgres
-      - PGPOOL_POSTGRES_CUSTOM_PASSWORDS=abcABC123
+      - PGPOOL_POSTGRES_CUSTOM_USERS=customuser
+      - PGPOOL_POSTGRES_CUSTOM_PASSWORDS=custompassword
     volumes:
       - ./pgpool/conf:/opt/bitnami/pgpool/conf
     healthcheck:
